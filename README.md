@@ -1,3 +1,7 @@
+Some modifications to the MultiSwag paper for Bayesian ML course project.
+Please look at the original Readme below for the original work.
+
+
 # Bayesian Deep Learning and a Probabilistic Perspective of Generalization
 
 This repository contains experiments for the paper
