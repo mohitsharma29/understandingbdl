@@ -8,7 +8,7 @@ from ._assess_dimension import _infer_dimension_
 class SWAG(torch.nn.Module):
 
     def __init__(self, base, subspace_type,
-                 subspace_kwargs=None, var_clamp=1e-6, *args, **kwargs):
+                 subspace_kwargs=None, var_clamp=1e-6, customModel=False, newMean=None, newCovar=None,*args, **kwargs):
         super(SWAG, self).__init__()
 
         self.base_model = base(*args, **kwargs)
@@ -28,6 +28,12 @@ class SWAG(torch.nn.Module):
 
         self.cov_factor = None
         self.model_device = 'cpu'
+        
+        # New project experiments
+        
+        self.customModel = customModel
+        self.newMean = newMean
+        self.newCovar = newCovar
         
     # dont put subspace on cuda?
     def cuda(self, device=None):
@@ -75,7 +81,10 @@ class SWAG(torch.nn.Module):
 
     def sample(self, scale=0.5, diag_noise=True):
         self.fit()
-        mean, variance = self._get_mean_and_variance()
+        if self.customModel == False:
+            mean, variance = self._get_mean_and_variance()
+        else:
+            mean, variance = self.newMean, self.newVariance
 
         eps_low_rank = torch.randn(self.cov_factor.size()[0])
         z = self.cov_factor.t() @ eps_low_rank

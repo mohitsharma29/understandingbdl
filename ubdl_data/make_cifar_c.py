@@ -11,9 +11,9 @@ import ctypes
 from wand.api import library as wandlibrary
 import numpy as np
 
-from ubdl_data.corruptions import gaussian_noise, shot_noise, impulse_noise, defocus_blur, glass_blur, motion_blur
-from ubdl_data.corruptions import zoom_blur, snow, frost, fog , brightness, contrast, elastic_transform, pixelate
-from ubdl_data.corruptions import jpeg_compression, speckle_noise, gaussian_blur, spatter, saturate
+from corruptions import gaussian_noise, shot_noise, impulse_noise, defocus_blur, glass_blur, motion_blur
+from corruptions import zoom_blur, snow, frost, fog , brightness, contrast, elastic_transform, pixelate
+from corruptions import jpeg_compression, speckle_noise, gaussian_blur, spatter, saturate
 
 warnings.simplefilter("ignore", UserWarning)
 
@@ -57,7 +57,7 @@ d['Spatter'] = spatter
 d['Saturate'] = saturate
 
 
-test_data = dset.CIFAR10(args.datapath, train=False)
+test_data = dset.CIFAR10(args.datapath, train=False, download=True)
 convert_img = trn.Compose([trn.ToTensor(), trn.ToPILImage()])
 
 os.makedirs(args.savepath, exist_ok=True)

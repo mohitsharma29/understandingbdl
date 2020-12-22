@@ -3,6 +3,7 @@ import os, sys
 import time
 import tabulate
 
+sys.path.append('/home/mohit/understandingbdl/')
 import torch
 import torch.nn.functional as F
 import torchvision
@@ -42,6 +43,7 @@ if torch.cuda.is_available():
 else:
     args.device = torch.device('cpu')
 
+#args.device = torch.device('cpu')
 
 torch.backends.cudnn.benchmark = True
 model_cfg = getattr(models, args.model)
@@ -64,6 +66,12 @@ if args.label_arr:
     print("Corruption:", (loaders['train'].dataset.targets != label_arr).mean())
     loaders['train'].dataset.targets = label_arr
 
+# Corrupted Test Set
+print('Using Noisy Test set')
+corrupted_testset = np.load("/media/data_dump/Mohit/bayesianML/cifar-corrupted/motion_blur_5.npz")
+loaders['test'].dataset.data = corrupted_testset["data"]
+loaders['test'].dataset.targets = corrupted_testset["labels"]
+
 print('Preparing model')
 model = model_cfg.base(*model_cfg.args, num_classes=num_classes,
                        **model_cfg.kwargs)
@@ -79,10 +87,8 @@ swag_model.to(args.device)
 
 
 columns = ['swag', 'sample', 'te_loss', 'te_acc', 'ens_loss', 'ens_acc']
-
-n_ensembled = 0.
+n_ensembled = 0
 multiswag_probs = None
-
 for ckpt_i, ckpt in enumerate(args.swag_ckpts):
     print("Checkpoint {}".format(ckpt))
     checkpoint = torch.load(ckpt)
@@ -110,6 +116,7 @@ for ckpt_i, ckpt in enumerate(args.swag_ckpts):
         values = [ckpt_i, sample, nll, acc, ens_nll, ens_acc]
         table = tabulate.tabulate([values], columns, tablefmt='simple', floatfmt='8.4f')
         print(table)
+
 
 print('Preparing directory %s' % args.savedir)
 os.makedirs(args.savedir, exist_ok=True)
